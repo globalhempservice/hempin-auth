@@ -1,3 +1,4 @@
+// src/app/login/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -25,13 +26,13 @@ export default function LoginPage() {
     if (!email) return
     setWorking(true); setMsg(null); setErr(null)
 
-    const origin = window.location.origin
-    const cb = new URL(`${origin}/callback`)
+    // Always send them back through auth.hempin.org/callback
+    const cb = new URL(`https://auth.hempin.org/callback`)
     cb.searchParams.set('next', nextUrl)
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: cb.toString() }
+      options: { emailRedirectTo: cb.toString() },
     })
 
     setWorking(false)
@@ -41,7 +42,10 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen grid place-items-center p-6">
-      <form onSubmit={sendMagic} className="w-full max-w-sm rounded-xl border border-white/10 bg-white/5 p-5">
+      <form
+        onSubmit={sendMagic}
+        className="w-full max-w-sm rounded-xl border border-white/10 bg-white/5 p-5"
+      >
         <h1 className="text-lg font-semibold">Sign in</h1>
         <p className="text-sm opacity-70 mt-1">We’ll email you a magic link.</p>
         <input

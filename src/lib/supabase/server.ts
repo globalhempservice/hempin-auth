@@ -1,13 +1,16 @@
 // src/lib/supabase/server.ts
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient as createSsrClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-const PARENT_DOMAIN = '.hempin.org' // share session across all subdomains
+/**
+ * IMPORTANT: We set cookies on the parent domain so ALL subdomains share the session.
+ */
+const PARENT_DOMAIN = '.hempin.org'
 
 export function createServerClientSupabase() {
   const cookieStore = cookies()
 
-  return createServerClient(
+  return createSsrClient(
     process.env.SUPABASE_URL as string,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
     {
@@ -22,6 +25,7 @@ export function createServerClientSupabase() {
             ? Omit<Parameters<typeof cookieStore.set>[0], 'name' | 'value'>
             : any
         ) {
+          // Write auth cookies on the parent domain for SSO
           cookieStore.set({
             name,
             value,
